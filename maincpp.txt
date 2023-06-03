@@ -1,0 +1,74 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <ctime>
+#include <random>
+#include <cmath>
+#include "md5.h"
+
+using namespace std;
+
+string Hash_func(string input)
+{
+    MD5 md5;
+    md5.add(input.c_str(), input.size());
+    return md5.getHash();
+}
+
+string Hash_func(int a)
+{
+    string input = to_string(a);
+    MD5 md5;
+    md5.add(input.c_str(), input.size());
+    return md5.getHash();
+}
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+
+    srand(time(NULL));
+
+    ofstream file_out, file_out_hash;
+
+    string id, dept;
+    int course;
+    float a_perfomance;
+
+    file_out.open("Excel_table.csv");
+    file_out_hash.open("Excel_table_hash.csv");
+
+    file_out << "id студента" << ';' << "Курс обучения" << ';' << "Средний балл" << ';' << "Академическая задолжность" << endl;
+    file_out_hash << "id студента" << ';' << "Курс обучения" << ';' << "Средний балл" << ';' << "Академическая задолжность" << endl;
+
+    for (int i = 0; i < 1000; ++i)
+    {
+	id = "st" + to_string(rand()%900000+100000);
+	course = rand()%4+1;
+
+	uniform_real_distribution<double> dist{2.0, 5.0};
+        mt19937 gen{random_device().operator ()()};
+        auto value = dist(gen);
+        value = value-remainder(value, 0.01);
+	a_perfomance = value;
+
+	if (rand()%2==0){
+		dept="Нет";
+	}
+	else {
+		dept="Есть";
+	}
+	
+        
+        file_out << id << ';' << course << ';' << a_perfomance << ';' << dept << endl;
+        file_out_hash << Hash_func(id) << ';' << course << ';' << Hash_func(a_perfomance) << ';' << dept << endl;
+    }
+
+    file_out.close();
+    file_out_hash.close();
+
+    //system("Excel_table.csv");
+    //system("Excel_table_hash.xlsx");
+
+    return 0;
+}
